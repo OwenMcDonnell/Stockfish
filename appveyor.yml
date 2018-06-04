@@ -60,10 +60,11 @@ build_script:
   - cmake --build . --config %CONFIGURATION% -- /verbosity:minimal
 
 before_test:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - cd src/%CONFIGURATION%
   - ps: |
       # Verify bench number
-      ./stockfish bench 2> out.txt 1> null
+      ./stockfish bench 2> out.txt
       $s = (gc "./out.txt" | out-string)
       $r = ($s -match 'Nodes searched \D+(\d+)' | % { $matches[1] })
       Write-Host "Engine bench:" $r
